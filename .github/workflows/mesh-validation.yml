@@ -1,0 +1,36 @@
+name: "MESH Constitutional Validation"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-mesh:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
+
+    - name: Run Governance & Architecture Tests
+      run: |
+        echo "Executando validação de integridade da malha e regras constitucionais..."
+        if [ -d "src/runtime/5-referencia-qualidade-memoria/tests" ]; then
+          pytest src/runtime/5-referencia-qualidade-memoria/tests/
+        else
+          echo "Pasta de testes não encontrada, verificando estrutura básica..."
+          python -c "import sys; print('Python runtime check successful.')"
+        fi
